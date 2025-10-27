@@ -1,7 +1,7 @@
 import 'package:album_biblio/model/album_biblio.dart';
 import 'package:flutter/material.dart';
 
-// Jesus Leonardo Dominguez Pazos
+// Jesus Leonardo Dominguez Pazos /Practica 3
 
 class AlbumLista extends StatefulWidget {
   const AlbumLista({super.key});
