@@ -6,21 +6,37 @@ class PerfilUsuario extends StatelessWidget {
   final String nombre = "Jesus Leonardo";
   final String puesto = "Desarrollador Informatico";
   final String descripcion =
-      " Experiencia en apps para empresas y proyectos personales con diseño limpio";
+      "Experiencia en apps para empresas y proyectos personales con diseño limpio";
   final String correo = "LeonardoPrueba@email.com";
   final String telefono = "+52 6624032025";
-  final String fotoPerfil = "assets/fotoperfil_NekoArc.jpg";
+  final String fotoPerfil = "assets/fotoPerfil.png";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(255, 132, 31, 1),
+        elevation: 4,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); 
+          },
+        ),
+        title: Text(
+          "Perfil de Usuario",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: Center(
         child: Card(
           elevation: 8,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          color: Color(0xFF2196F3),
+          color: Color.fromRGBO(255, 132, 31, 1),
           child: Container(
             width: 350,
             height: 450,

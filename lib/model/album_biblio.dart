@@ -1,11 +1,13 @@
+
 class AlbumBiblio {
-  final List<Album> _listaAlbumes = [];
-  AlbumBiblio();
-  List<Album> get albumes => _listaAlbumes;
-  void addAlbum(Album album) {
-    _listaAlbumes.add(album);
-  }
-}
+ final List<Album> _listaAlbumes = [];
+ AlbumBiblio();
+ List<Album> get albumes => _listaAlbumes;
+ void addAlbum(Album album) {
+ _listaAlbumes.add(album);}
+ Album getAlbumByIndex(int index) {
+ return _listaAlbumes[index];}} 
+
 
 class Album {
   String? id;

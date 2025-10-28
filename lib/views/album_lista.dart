@@ -1,5 +1,8 @@
-import 'package:album_biblio/model/album_biblio.dart';
 import 'package:flutter/material.dart';
+import 'package:album_biblio/model/album_biblio.dart' as model;
+import 'package:album_biblio/views/album.dart';
+import 'package:album_biblio/views/album_vista.dart';
+import 'perfil_usuario.dart';
 
 // Jesus Leonardo Dominguez Pazos /Practica 3
 
@@ -12,67 +15,99 @@ class AlbumLista extends StatefulWidget {
 
 class _AlbumListaState extends State<AlbumLista> {
   int albumSelect = 0;
-  late AlbumBiblio albumes;
+  late model.AlbumBiblio albumes;
+
+Genre stringToGenre(String genreString) {
+  try{
+    return Genre.values.byName(genreString);
+  }catch(e) {
+    return Genre.undefined;
+  }
+}
 
   @override
   void initState() {
     super.initState();
-    albumes = AlbumBiblio();
+    albumes = model.AlbumBiblio();
     albumes.addAlbum(
-      Album(
+      model.Album(
         titulo: "Yurushite",
         artista: "t+Pazolite",
         anio: 2022,
-        gender: "Electronica",
+        gender: Genre.rock.name,
       ),
     );
     albumes.addAlbum(
-      Album(
+      model.Album(
         titulo: "Third Sanctuary",
         artista: "Toby fox",
         anio: 2025,
-        gender: "Electronica",
+        gender: Genre.electronica.name,
       ),
     );
     albumes.addAlbum(
-      Album(
+      model.Album(
         titulo: "The resistance",
         artista: "Skillet",
         anio: 2018,
-        gender: "Rock",
+        gender: Genre.rock.name,
       ),
     );
     albumes.addAlbum(
-      Album(titulo: "Monster", artista: "Skillet", anio: 2022, gender: "Rock"),
+      model.Album(
+        titulo: "Monster",
+        artista: "Skillet",
+        anio: 2022,
+        gender: Genre.rock.name,
+      ),
     );
     albumes.addAlbum(
-      Album(
+      model.Album(
         titulo: "Hopes and dreams",
         artista: "Toby fox",
         anio: 2011,
-        gender: "Electronica",
+        gender: Genre.electronica.name,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+      backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: AppBar(
         title: const Text(
           "Lista de Álbumes Musicales",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Color.fromRGBO(255, 132, 31, 1),
-        foregroundColor: Color.fromRGBO(255, 255, 255, 1),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) => <PopupMenuEntry>[
+              const PopupMenuItem(value: 1, child: Text("Perfíl del usuario")),
+              const PopupMenuItem(value: 2, child: Text("Acerca de ...")),
+            ],
+            onSelected: (value) {
+              setState(() {
+                if (value == 1) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PerfilUsuario(),
+                    ),
+                  );
+                } else if (value == 2) {}
+              });
+            },
+          ),
+        ],
+
+        backgroundColor: const Color.fromRGBO(255, 132, 31, 1),
+        foregroundColor: Colors.white,
         elevation: 4,
       ),
       body: RefreshIndicator(
         displacement: 30,
         edgeOffset: 15,
-        color: Color.fromRGBO(255, 132, 31, 1),
+        color: const Color.fromRGBO(255, 132, 31, 1),
         onRefresh: Actualizar,
         child: ListView(
           padding: const EdgeInsets.all(10),
@@ -80,7 +115,7 @@ class _AlbumListaState extends State<AlbumLista> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromRGBO(255, 132, 31, 1),
+        backgroundColor: const Color.fromRGBO(255, 132, 31, 1),
         foregroundColor: Colors.white,
         onPressed: () {},
         child: const Icon(Icons.add),
@@ -96,7 +131,7 @@ class _AlbumListaState extends State<AlbumLista> {
   List<Widget> nuevaLista() {
     final List<Widget> lista = <Widget>[];
     for (int i = 0; i < albumes.albumes.length; i++) {
-      Album album = albumes.albumes[i];
+      model.Album album = albumes.albumes[i]; // <- usar alias aquí
       lista.add(
         Card(
           color: Colors.white,
@@ -137,21 +172,32 @@ class _AlbumListaState extends State<AlbumLista> {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
+          tooltip: "Ver",
           icon: const Icon(Icons.search),
-          color: Color.fromRGBO(255, 132, 31, 1),
-          onPressed: () {},
+          color: const Color(0xFFFF841F),
+          onPressed: () {
+            mostrarAlbum(context, index);
+          },
         ),
         IconButton(
           icon: const Icon(Icons.edit),
-          color: Color.fromRGBO(255, 132, 31, 1),
+          color: const Color(0xFFFF841F),
           onPressed: () {},
         ),
         IconButton(
           icon: const Icon(Icons.delete),
-          color: Color.fromRGBO(255, 132, 31, 1),
+          color: const Color(0xFFFF841F),
           onPressed: () {},
         ),
       ],
+    );
+  }
+
+  void mostrarAlbum(BuildContext context, int index) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AlbumVista(album: albumes.getAlbumByIndex(index)),
+      ),
     );
   }
 }
