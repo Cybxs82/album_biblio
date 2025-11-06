@@ -3,8 +3,10 @@ import 'package:album_biblio/model/album_biblio.dart' as model;
 import 'package:album_biblio/views/album.dart';
 import 'package:album_biblio/views/album_vista.dart';
 import 'perfil_usuario.dart';
+import 'album_form.dart';
+import 'package:provider/provider.dart';
 
-// Jesus Leonardo Dominguez Pazos /Practica 3
+// Jesus Leonardo Dominguez Pazos /Practica
 
 class AlbumLista extends StatefulWidget {
   const AlbumLista({super.key});
@@ -17,62 +19,17 @@ class _AlbumListaState extends State<AlbumLista> {
   int albumSelect = 0;
   late model.AlbumBiblio albumes;
 
-Genre stringToGenre(String genreString) {
-  try{
-    return Genre.values.byName(genreString);
-  }catch(e) {
-    return Genre.undefined;
-  }
-}
-
-  @override
-  void initState() {
-    super.initState();
-    albumes = model.AlbumBiblio();
-    albumes.addAlbum(
-      model.Album(
-        titulo: "Yurushite",
-        artista: "t+Pazolite",
-        anio: 2022,
-        gender: Genre.rock.name,
-      ),
-    );
-    albumes.addAlbum(
-      model.Album(
-        titulo: "Third Sanctuary",
-        artista: "Toby fox",
-        anio: 2025,
-        gender: Genre.electronica.name,
-      ),
-    );
-    albumes.addAlbum(
-      model.Album(
-        titulo: "The resistance",
-        artista: "Skillet",
-        anio: 2018,
-        gender: Genre.rock.name,
-      ),
-    );
-    albumes.addAlbum(
-      model.Album(
-        titulo: "Monster",
-        artista: "Skillet",
-        anio: 2022,
-        gender: Genre.rock.name,
-      ),
-    );
-    albumes.addAlbum(
-      model.Album(
-        titulo: "Hopes and dreams",
-        artista: "Toby fox",
-        anio: 2011,
-        gender: Genre.electronica.name,
-      ),
-    );
+  Genre stringToGenre(String genreString) {
+    try {
+      return Genre.values.byName(genreString);
+    } catch (e) {
+      return Genre.undefined;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    albumes = Provider.of<model.AlbumBiblio>(context);
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: AppBar(
@@ -90,9 +47,7 @@ Genre stringToGenre(String genreString) {
               setState(() {
                 if (value == 1) {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PerfilUsuario(),
-                    ),
+                    MaterialPageRoute(builder: (context) => PerfilUsuario()),
                   );
                 } else if (value == 2) {}
               });
@@ -104,20 +59,31 @@ Genre stringToGenre(String genreString) {
         foregroundColor: Colors.white,
         elevation: 4,
       ),
-      body: RefreshIndicator(
-        displacement: 30,
-        edgeOffset: 15,
-        color: const Color.fromRGBO(255, 132, 31, 1),
-        onRefresh: Actualizar,
-        child: ListView(
-          padding: const EdgeInsets.all(10),
-          children: nuevaLista(),
-        ),
-      ),
+      body: (albumes.albumes.isNotEmpty)
+          ? ListView(
+              padding: const EdgeInsets.all(10),
+              children: ListTile.divideTiles(
+                context: context,
+                tiles: nuevaLista(),
+                color: Colors.amber,
+              ).toList(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    capturarAlbum(context);
+                  },
+                  child: const Text("Agregar Album"),
+                ),
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromRGBO(255, 132, 31, 1),
-        foregroundColor: Colors.white,
-        onPressed: () {},
+        onPressed: () {
+          capturarAlbum(context);
+        },
+        tooltip: 'Nuevo album',
         child: const Icon(Icons.add),
       ),
     );
@@ -131,7 +97,7 @@ Genre stringToGenre(String genreString) {
   List<Widget> nuevaLista() {
     final List<Widget> lista = <Widget>[];
     for (int i = 0; i < albumes.albumes.length; i++) {
-      model.Album album = albumes.albumes[i]; // <- usar alias aquí
+      Album album = albumes.albumes[i]; // <- usar alias aquí
       lista.add(
         Card(
           color: Colors.white,
@@ -147,7 +113,7 @@ Genre stringToGenre(String genreString) {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              "${album.artista}, Género: ${album.gender}, Año: ${album.anio}",
+              "${album.artista}, Género: ${album.genre}, Año: ${album.anio}",
               style: const TextStyle(color: Colors.black54),
             ),
             trailing: crearButtonsBar(i),
@@ -189,8 +155,32 @@ Genre stringToGenre(String genreString) {
           color: const Color(0xFFFF841F),
           onPressed: () {},
         ),
+        IconButton(
+          tooltip: "Editar",
+          onPressed: () {
+            actualizarAlbum(context, index);
+          },
+          icon: const Icon(Icons.edit),
+        ),
+        IconButton(
+          tooltip: "Eliminar",
+          onPressed: () {
+            removerAlbum(index);
+          },
+          icon: const Icon(Icons.delete),
+        ),
       ],
     );
+  }
+
+  Future<void> capturarAlbum(BuildContext context) async {
+    final Album? album = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AlbumForm()),
+    );
+    if (album != null) {
+      albumes.addAlbum(album);
+    }
   }
 
   void mostrarAlbum(BuildContext context, int index) {
@@ -199,5 +189,22 @@ Genre stringToGenre(String genreString) {
         builder: (context) => AlbumVista(album: albumes.getAlbumByIndex(index)),
       ),
     );
+  }
+
+  Future<void> actualizarAlbum(BuildContext context, int index) async {
+    Album? album = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AlbumForm(album: albumes.getAlbumByIndex(index)),
+      ),
+    );
+
+    if (album != null) {
+      albumes.updateAlbum(index, album);
+    }
+  }
+
+  bool removerAlbum(int index) {
+    return albumes.removeAlbum(index);
   }
 }

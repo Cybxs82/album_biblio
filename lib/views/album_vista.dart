@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:album_biblio/model/album_biblio.dart'; 
+import 'package:album_biblio/views/album.dart';
 
 class AlbumVista extends StatelessWidget {
   final Album album; 
@@ -59,7 +60,7 @@ class AlbumVista extends StatelessWidget {
                   titulo: "Año de lanzamiento: ",
                   valor: album.anio.toString(),
                 ),
-                infoRow(titulo: "Género: ", valor: album.gender),
+                infoRow(titulo: "Género: ", valor: album.genre.name),
               ],
             ),
           ),
