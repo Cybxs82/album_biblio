@@ -3,8 +3,19 @@ import 'package:flutter/material.dart';
 
 class AlbumBiblio extends ChangeNotifier {
   final List<Album> _listaAlbumes = [];
+  static String nombreArchivo = "albumes.json";
   AlbumBiblio();
   List<Album> get albumes => _listaAlbumes;
+
+  Album getAlbumByIndex(int index) => _listaAlbumes[index];
+  void setAlbumes(List<Album> albumes) {
+    _listaAlbumes.clear();
+    for (Album album in albumes) {
+      _listaAlbumes.add(album);
+    }
+    notifyListeners();
+  }
+
   void addAlbum(Album album) {
     _listaAlbumes.add(album);
     notifyListeners();
@@ -26,9 +37,5 @@ class AlbumBiblio extends ChangeNotifier {
       return true;
     }
     return false;
-  }
-
-  Album getAlbumByIndex(int index) {
-    return _listaAlbumes[index];
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:album_biblio/model/album_biblio.dart'; 
 import 'package:album_biblio/views/album.dart';
 
 class AlbumVista extends StatelessWidget {

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'views/album_lista.dart';
 import 'package:provider/provider.dart';
 import 'package:album_biblio/model/album_biblio.dart';
+
 void main() {
- runApp(
- ChangeNotifierProvider(create: (_) => AlbumBiblio(),
- child: const MyApp()),
- );} 
+  runApp(
+    ChangeNotifierProvider(create: (_) => AlbumBiblio(), child: const MyApp()),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

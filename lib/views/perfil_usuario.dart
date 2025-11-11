@@ -11,6 +11,8 @@ class PerfilUsuario extends StatelessWidget {
   final String telefono = "+52 6624032025";
   final String fotoPerfil = "assets/fotoPerfil.png";
 
+  const PerfilUsuario({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,8 +5,7 @@ import 'package:album_biblio/views/album_vista.dart';
 import 'perfil_usuario.dart';
 import 'album_form.dart';
 import 'package:provider/provider.dart';
-
-// Jesus Leonardo Dominguez Pazos /Practica
+import '../model/ManejadorDatabase.dart';
 
 class AlbumLista extends StatefulWidget {
   const AlbumLista({super.key});
@@ -18,6 +17,9 @@ class AlbumLista extends StatefulWidget {
 class _AlbumListaState extends State<AlbumLista> {
   int albumSelect = 0;
   late model.AlbumBiblio albumes;
+  bool dbRead = false;
+  int selectedAlbum = 0;
+  late ManejadorDatabase manejadorDB;
 
   Genre stringToGenre(String genreString) {
     try {
@@ -28,8 +30,26 @@ class _AlbumListaState extends State<AlbumLista> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    manejadorDB = ManejadorDatabase.getInstance();
+  }
+
+  @override
+  void dispose() {
+    manejadorDB.cerrarDB();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     albumes = Provider.of<model.AlbumBiblio>(context);
+    if (!dbRead) {
+      manejadorDB.albumes().then((value) {
+        albumes.setAlbumes(value);
+        dbRead = true;
+      });
+    }
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: AppBar(
@@ -59,7 +79,9 @@ class _AlbumListaState extends State<AlbumLista> {
         foregroundColor: Colors.white,
         elevation: 4,
       ),
-      body: (albumes.albumes.isNotEmpty)
+      body: !dbRead
+          ? const Center(child: CircularProgressIndicator())
+          : (albumes.albumes.isNotEmpty)
           ? ListView(
               padding: const EdgeInsets.all(10),
               children: ListTile.divideTiles(
@@ -97,7 +119,7 @@ class _AlbumListaState extends State<AlbumLista> {
   List<Widget> nuevaLista() {
     final List<Widget> lista = <Widget>[];
     for (int i = 0; i < albumes.albumes.length; i++) {
-      Album album = albumes.albumes[i]; // <- usar alias aquí
+      Album album = albumes.albumes[i]; 
       lista.add(
         Card(
           color: Colors.white,
@@ -146,17 +168,8 @@ class _AlbumListaState extends State<AlbumLista> {
           },
         ),
         IconButton(
-          icon: const Icon(Icons.edit),
-          color: const Color(0xFFFF841F),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete),
-          color: const Color(0xFFFF841F),
-          onPressed: () {},
-        ),
-        IconButton(
           tooltip: "Editar",
+          color: const Color(0xFFFF841F),
           onPressed: () {
             actualizarAlbum(context, index);
           },
@@ -164,6 +177,7 @@ class _AlbumListaState extends State<AlbumLista> {
         ),
         IconButton(
           tooltip: "Eliminar",
+          color: const Color(0xFFFF841F),
           onPressed: () {
             removerAlbum(index);
           },
@@ -179,6 +193,8 @@ class _AlbumListaState extends State<AlbumLista> {
       MaterialPageRoute(builder: (context) => const AlbumForm()),
     );
     if (album != null) {
+      int id = await manejadorDB.insertarAlbum(album);
+      album.id = id;
       albumes.addAlbum(album);
     }
   }
@@ -198,13 +214,16 @@ class _AlbumListaState extends State<AlbumLista> {
         builder: (context) => AlbumForm(album: albumes.getAlbumByIndex(index)),
       ),
     );
-
     if (album != null) {
       albumes.updateAlbum(index, album);
+      manejadorDB.actualizarAlbum(album);
     }
   }
 
   bool removerAlbum(int index) {
-    return albumes.removeAlbum(index);
+    Album album = albumes.getAlbumByIndex(index);
+    bool eliminado = albumes.removeAlbum(index);
+    manejadorDB.removerAlbum(album.id!);
+    return eliminado;
   }
 }
