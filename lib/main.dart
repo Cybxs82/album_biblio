@@ -10,13 +10,15 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp
-  (options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseUIAuth.configureProviders([
     EmailAuthProvider(),
+    PhoneAuthProvider(),
     GoogleProvider(clientId: DefaultFirebaseOptions.currentPlatform.appId),
   ]);
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(create: (_) => AlbumBiblio(), child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -33,5 +35,4 @@ class MyApp extends StatelessWidget {
       home: const PaginaLogin(),
     );
   }
-  
 }

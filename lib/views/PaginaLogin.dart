@@ -10,7 +10,15 @@ class PaginaLogin extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return const SignInScreen();
+          return SignInScreen(
+            headerBuilder: (context, constraints, shrinkOffset) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Image.asset('assets/logo.png'),
+              );
+            },
+            showAuthActionSwitch: false,
+          );
         }
         return const Center(child: Text("Página Login, usuario autenticado"));
       },
